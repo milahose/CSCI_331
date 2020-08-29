@@ -59,22 +59,23 @@ int process_stream(WordCountEntry entries[], int entry_count)
 
 void print_result(WordCountEntry entries[], int entry_count)
 {
-  printf("Result:\n");
+  fprintf(stdout, "Result:\n");
   for (int i = 0; i < entry_count; i++) {
-    printf("%s:%d\n", entries[i].word, entries[i].counter);
+    fprintf(stdout, "%s:%d\n", entries[i].word, entries[i].counter);
   }
 }
 
 
 void printHelp(const char *name)
 {
-  printf("usage: %s [-h] <word1> ... <wordN>\n", name);
+  fprintf(stderr, "usage: %s [-h] [-f FILENAME] <word1> ... <wordN>\n", name);
 }
 
 
 int main(int argc, char **argv)
 {
   const char *prog_name = *argv;
+  const char *file_name = argc > 3 ? argv[2] : NULL;
 
   WordCountEntry entries[5];
   int entryCount = 0;
@@ -93,8 +94,12 @@ int main(int argc, char **argv)
         case 'h':
           printHelp(prog_name);
           break;
+        case 'f':
+          argv++; // don't show file name in word count result
+          freopen(file_name, "w", stdout); // open file stream
+          break;
         default:
-          printf("%s: Invalid option %s. Use -h for help.\n", prog_name, *argv);
+          fprintf(stderr, "%s: Invalid option %s. Use -h for help.\n", prog_name, *argv);
       }
     } else {
       if (entryCount < LENGTH(entries)) {
@@ -105,13 +110,13 @@ int main(int argc, char **argv)
     argv++;
   }
   if (entryCount == 0) {
-    printf("%s: Please supply at least one word. Use -h for help.\n", prog_name);
+    fprintf(stderr, "%s: Please supply at least one word. Use -h for help.\n", prog_name);
     return EXIT_FAILURE;
   }
   if (entryCount == 1) {
-    printf("Looking for a single word\n");
+    fprintf(stdout, "Looking for a single word\n");
   } else {
-    printf("Looking for %d words\n", entryCount);
+    fprintf(stdout, "Looking for %d words\n", entryCount);
   }
 
   process_stream(entries, entryCount);
