@@ -93,7 +93,7 @@ int main(int argc, char **argv)
       switch ((*argv)[1]) {
         case 'h':
           printHelp(prog_name);
-          break;
+          return EXIT_FAILURE;
         case 'f':
           argv++; // don't show file name in word count result
           freopen(file_name, "w", stdout); // open file stream
