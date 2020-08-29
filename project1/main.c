@@ -85,15 +85,16 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
   }
 
+  argv++;
   while (*argv != NULL) {
     if (**argv == '-') {
 
       switch ((*argv)[1]) {
         case 'h':
           printHelp(prog_name);
+          break;
         default:
-          printf("%s: Invalid option %s. Use -h for help.\n",
-                 prog_name, *argv);
+          printf("%s: Invalid option %s. Use -h for help.\n", prog_name, *argv);
       }
     } else {
       if (entryCount < LENGTH(entries)) {
@@ -104,8 +105,7 @@ int main(int argc, char **argv)
     argv++;
   }
   if (entryCount == 0) {
-    printf("%s: Please supply at least one word. Use -h for help.\n",
-           prog_name);
+    printf("%s: Please supply at least one word. Use -h for help.\n", prog_name);
     return EXIT_FAILURE;
   }
   if (entryCount == 1) {
