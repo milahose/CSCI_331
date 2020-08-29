@@ -60,8 +60,8 @@ int process_stream(WordCountEntry entries[], int entry_count)
 void print_result(WordCountEntry entries[], int entry_count)
 {
   printf("Result:\n");
-  while (entry_count-- > 0) {
-    printf("%s:%d\n", entries->word, entries->counter);
+  for (int i = 0; i < entry_count; i++) {
+    printf("%s:%d\n", entries[i].word, entries[i].counter);
   }
 }
 
