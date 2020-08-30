@@ -42,16 +42,22 @@ int process_stream(WordCountEntry entries[], int entry_count)
   short line_count = 0;
   char buffer[30];
 
-  while (gets(buffer)) {
-    if (*buffer == '.')
-      break;
+  while (fgets(buffer, sizeof(buffer), stdin)) {
+    if (!strcmp(buffer, ".\n")) break;
+
+    // Create token w/ space, tab, and newline delimeters
+    char *token = strtok(buffer, " \t\n");
+
     /* Compare against each entry */
-    int i = 0;
-    while (i < entry_count) {
-      if (!strcmp(entries[i].word, buffer))
-        entries[i].counter++;
-      i++;
+    while (token != NULL) {
+      for (int i = 0; i < entry_count; i++) {
+        if (!strcmp(entries[i].word, token)) {
+          entries[i].counter++;
+        }
+      }
+      token = strtok(NULL, " \t\n");
     }
+
     line_count++;
   }
   return line_count;
