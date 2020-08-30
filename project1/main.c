@@ -75,16 +75,16 @@ void print_result(WordCountEntry entries[], int entry_count)
 
 void printHelp(const char *name)
 {
-  fprintf(stderr, "usage: %s [-h] [-f FILENAME] <word1> ... <wordN>\n", name);
+  fprintf(stderr, "usage: %s [-h] [-f]FILENAME <word1> ... <wordN>\n", name);
 }
 
 
 int main(int argc, char **argv)
 {
   const char *prog_name = *argv;
-  const char *file_name = argc > 3 ? argv[2] : NULL;
+  char *file_name = NULL;
 
-  int arg_count = !strcmp(argv[1], "-f") ? argc - 3 : argc - 1;
+  int arg_count = argc - 1;
   int entryCount = 0;
 
   WordCountEntry *entries;
@@ -107,7 +107,8 @@ int main(int argc, char **argv)
           printHelp(prog_name);
           return EXIT_FAILURE;
         case 'f':
-          argv++; // don't show file name in word count result
+          file_name = (*argv + 2);
+          fprintf(stdout, "Results printed to '%s' file in working directory.\n", file_name);
           freopen(file_name, "w", stdout); // open file stream
           break;
         default:
