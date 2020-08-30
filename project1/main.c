@@ -108,7 +108,8 @@ int main(int argc, char **argv)
           return EXIT_FAILURE;
         case 'f':
           file_name = (*argv + 2);
-          fprintf(stdout, "Results printed to '%s' file in working directory.\n", file_name);
+          if (strlen(file_name) > 0) // don't print message unless there's actually a file name
+            fprintf(stdout, "Results printed to '%s' file in working directory.\n", file_name);
           freopen(file_name, "w", stdout); // open file stream
           break;
         default:
