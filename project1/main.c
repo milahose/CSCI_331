@@ -27,6 +27,7 @@ Expected output:
 #include <string.h>
 #include "smp0_tests.h"
 
+// This is no longer needed with the malloc implementation
 #define LENGTH(s) (sizeof(s) / sizeof(*s))
 
 /* Structures */
@@ -77,8 +78,11 @@ int main(int argc, char **argv)
   const char *prog_name = *argv;
   const char *file_name = argc > 3 ? argv[2] : NULL;
 
-  WordCountEntry entries[5];
+  int arg_count = !strcmp(argv[1], "-f") ? argc - 3 : argc - 1;
   int entryCount = 0;
+
+  WordCountEntry *entries;
+  entries = (WordCountEntry *)malloc(sizeof(WordCountEntry) * arg_count);
 
   /* Entry point for the testrunner program */
   if (argc > 1 && !strcmp(argv[1], "-test")) {
@@ -86,7 +90,9 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
   }
 
+  // Increment by 1 to skip program name
   argv++;
+
   while (*argv != NULL) {
     if (**argv == '-') {
 
@@ -102,7 +108,7 @@ int main(int argc, char **argv)
           fprintf(stderr, "%s: Invalid option %s. Use -h for help.\n", prog_name, *argv);
       }
     } else {
-      if (entryCount < LENGTH(entries)) {
+      if (entryCount < arg_count) {
         entries[entryCount].word = *argv;
         entries[entryCount++].counter = 0;
       }
