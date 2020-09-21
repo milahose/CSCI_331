@@ -60,6 +60,8 @@ int main(int argc, char **argv)
 	char buffer[SHELL_BUFFER_SIZE];
 	/* exec_argv: Arguments passed to exec call including NULL terminator. */
 	char *exec_argv[SHELL_MAX_ARGS + 1];
+	/* arg_history: Store arguments history for quick repeat commands */
+	char arg_history[9][SHELL_BUFFER_SIZE];
 
 	/* Entrypoint for the testrunner program */
 	if (argc > 1 && !strcmp(argv[1], "-test")) {
@@ -85,9 +87,22 @@ int main(int argc, char **argv)
 		run_in_background = n_read > 2 && buffer[n_read - 2] == '&';
 		buffer[n_read - run_in_background - 1] = '\n';
 
-		/* Parse the arguments: the first argument is the file or command *
-		 * we want to run.                                                */
+		/* First check to see if we are executing a cached command */
+		if (buffer[0] == '!') {
+			int idx = buffer[1] - '0';
+			if ((idx > 0) && (idx <= 9) && (idx < counter)) {
+				strncpy(buffer, arg_history[idx - 1], SHELL_BUFFER_SIZE);
+			} else {
+				fprintf(stderr, "Not valid\n");
+			}
+		}
 
+		/* Pull arg into history, if storage available */
+		if (buffer[0] != '\n' && counter <= 9) {
+			strncpy(arg_history[counter - 1], buffer, SHELL_BUFFER_SIZE);
+		}
+
+		/* Parse the arguments: the first argument is the file or command we want to run */
 		parser_state = STATE_SPACE;
 		for (exec_argc = 0, i = 0;
 		     (buffer[i] != '\n') && (exec_argc < SHELL_MAX_ARGS); i++) {
