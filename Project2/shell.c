@@ -21,7 +21,7 @@ enum { STATE_SPACE, STATE_NON_SPACE };	/* Parser states */
 
 int imthechild(const char *path_to_exec, char *const args[])
 {
-	return execv(path_to_exec, args) ? -1 : 0;
+	return execvp(path_to_exec, args) ? -1 : 0;
 }
 
 void imtheparent(pid_t child_pid, int run_in_background)
@@ -37,7 +37,7 @@ void imtheparent(pid_t child_pid, int run_in_background)
 		        "  Parent says 'run_in_background=1 ... so we're not waiting for the child'\n");
 		return;
 	}
-	wait(&child_return_val);
+	waitpid(child_pid, &child_return_val, 0);
 	/* Use the WEXITSTATUS to extract the status code from the return value */
 	child_error_code = WEXITSTATUS(child_return_val);
 	fprintf(stderr,
@@ -55,7 +55,7 @@ void imtheparent(pid_t child_pid, int run_in_background)
 int main(int argc, char **argv)
 {
 	pid_t shell_pid, pid_from_fork;
-	int n_read, i, exec_argc, parser_state, run_in_background;
+	int n_read, i, exec_argc, parser_state, run_in_background, counter;
 	/* buffer: The Shell's input buffer. */
 	char buffer[SHELL_BUFFER_SIZE];
 	/* exec_argv: Arguments passed to exec call including NULL terminator. */
@@ -69,10 +69,13 @@ int main(int argc, char **argv)
 	/* Allow the Shell prompt to display the pid of this process */
 	shell_pid = getpid();
 
+	/* Set arg counter */
+	counter = 1;
+
 	while (1) {
 	/* The Shell runs in an infinite loop, processing input. */
 
-		fprintf(stdout, "Shell(pid=%d)> ", shell_pid);
+		fprintf(stdout, "Shell(pid=%d)%d> ", shell_pid, counter);
 		fflush(stdout);
 
 		/* Read a line of input. */
@@ -98,6 +101,8 @@ int main(int argc, char **argv)
 				parser_state = STATE_SPACE;
 			}
 		}
+
+		counter = exec_argc > 0 ? counter + 1 : counter;
 
 		/* run_in_background is 1 if the input line's last character *
 		 * is an ampersand (indicating background execution).        */
