@@ -55,7 +55,7 @@ void imtheparent(pid_t child_pid, int run_in_background)
 int main(int argc, char **argv)
 {
 	pid_t shell_pid, pid_from_fork;
-	int n_read, i, exec_argc, parser_state, run_in_background, counter;
+	int n_read, i, exec_argc, parser_state, run_in_background, counter, subshell_depth;
 	/* buffer: The Shell's input buffer. */
 	char buffer[SHELL_BUFFER_SIZE];
 	/* exec_argv: Arguments passed to exec call including NULL terminator. */
@@ -73,6 +73,9 @@ int main(int argc, char **argv)
 
 	/* Set arg counter */
 	counter = 1;
+
+	/* Set sub shell depth */
+	subshell_depth = 1;
 
 	while (1) {
 	/* The Shell runs in an infinite loop, processing input. */
@@ -156,7 +159,16 @@ int main(int argc, char **argv)
 				continue;
 			}
 			if (pid_from_fork == 0) {
-				return imthechild(exec_argv[0], &exec_argv[0]);
+				if (!strcmp(exec_argv[0], "sub")) {
+					shell_pid = getpid();
+					subshell_depth++;
+					if (subshell_depth >= 3) {
+						fprintf(stderr, "Too deep!\n");
+						return 0;
+					}
+				} else {
+					return imthechild(exec_argv[0], &exec_argv[0]);
+				}
 				/* Exit from main. */
 			} else {
 				imtheparent(pid_from_fork, run_in_background);
