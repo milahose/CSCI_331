@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 	counter = 1;
 
 	/* Set sub shell depth */
-	subshell_depth = 1;
+	subshell_depth = 0;
 
 	while (1) {
 	/* The Shell runs in an infinite loop, processing input. */
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 				if (!strcmp(exec_argv[0], "sub")) {
 					shell_pid = getpid();
 					subshell_depth++;
-					if (subshell_depth >= 3) {
+					if (subshell_depth > 2) {
 						fprintf(stderr, "Too deep!\n");
 						return 0;
 					}
