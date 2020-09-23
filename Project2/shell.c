@@ -21,6 +21,9 @@ enum { STATE_SPACE, STATE_NON_SPACE };	/* Parser states */
 
 int imthechild(const char *path_to_exec, char *const args[])
 {
+	if (!strcmp(path_to_exec, "/bin/true"))
+		return execvp("true", args) ? -1 : 0;
+		
 	return execvp(path_to_exec, args) ? -1 : 0;
 }
 
