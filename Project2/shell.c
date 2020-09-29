@@ -77,13 +77,20 @@ int main(int argc, char **argv)
 	/* Set arg counter */
 	counter = 1;
 
+	/* Set sub counter */
+	int sub_counter[3] = {0, 0, 0};
+
 	/* Set sub shell depth */
-	subshell_depth = 0;
+	subshell_depth = -1;
 
 	while (1) {
 	/* The Shell runs in an infinite loop, processing input. */
 
-		fprintf(stdout, "Shell(pid=%d)%d> ", shell_pid, counter);
+		if (subshell_depth >= 0) {
+			sub_counter[subshell_depth]++;
+		}
+
+		fprintf(stdout, "Shell(pid=%d)%d> ", shell_pid, subshell_depth >= 0 ? sub_counter[subshell_depth] : counter);
 		fflush(stdout);
 
 		/* Read a line of input. */
@@ -123,7 +130,7 @@ int main(int argc, char **argv)
 			}
 		}
 
-		counter = exec_argc > 0 ? counter + 1 : counter;
+		counter = exec_argc > 0 && subshell_depth < 0 ? counter + 1 : counter;
 
 		/* run_in_background is 1 if the input line's last character *
 		 * is an ampersand (indicating background execution).        */
@@ -139,6 +146,8 @@ int main(int argc, char **argv)
 
 		/* If Shell runs 'exit' it exits the program. */
 		if (!strcmp(exec_argv[0], "exit")) {
+			sub_counter[subshell_depth] = 0;
+			subshell_depth--;
 			printf("Exiting process %d\n", shell_pid);
 			return EXIT_SUCCESS;	/* End Shell program */
 
@@ -165,7 +174,7 @@ int main(int argc, char **argv)
 				if (!strcmp(exec_argv[0], "sub")) {
 					shell_pid = getpid();
 					subshell_depth++;
-					if (subshell_depth > 2) {
+					if (subshell_depth >= 2) {
 						fprintf(stderr, "Too deep!\n");
 						return 0;
 					}
