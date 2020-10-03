@@ -59,9 +59,9 @@ int make_enzyme_threads(pthread_t * enzymes, char *string, void *(*fp)(void *)) 
   int i, rv, len;
   thread_info_t *info;
   len = strlen(string);
-  info = (thread_info_t *)malloc(sizeof(thread_info_t));
 
   for (i = 0; i < len - 1; i++) {
+    info = (thread_info_t *)malloc(sizeof(thread_info_t));
     info->string = string + i;
     rv = pthread_create(enzymes + i, NULL, fp, info);
     if (rv) {
