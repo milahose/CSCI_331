@@ -31,7 +31,7 @@ void *run_enzyme(void *data) {
   int oldvalue;
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldvalue);
   char *s = info -> string;
-  if(s[0] == 'C') pthread_cancel(pthread_self());
+  if(s[0] == 'C') pthread_exit(PTHREAD_CANCELED); // Changed this to get cancel test to pass on macOs!
 
   while(!please_quit) {
     if(s[0] > s[1]) {
