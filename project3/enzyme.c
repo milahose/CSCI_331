@@ -77,24 +77,27 @@ int join_on_enzymes(pthread_t *threads, int n) {
   // Just to make the code compile. You will need to replace every usage of
   // this variable in the code below. When you are done, placeholder can be
   // deleted.
-  void* placeholder = 0;
+  void* status = 0;
 
   for(i = 0; i < n; i++) {
     void *status;
+    int cancel_count = 0;
     int rv = pthread_join(threads[i], &status);
 
-    if (placeholder) {
+    if (rv) {
       fprintf(stderr,"Can't join thread %d:%s.\n",i,strerror(rv));
       continue;
     }
 
-    if (placeholder == PTHREAD_CANCELED) {
+    if ((void*)status == PTHREAD_CANCELED) {
+      cancel_count++;
       continue;
     } else if (status == NULL) {
       printf("Thread %d did not return anything\n",i);
     } else {
       printf("Thread %d exited normally: ",i);// Don't change this line
-      int threadswapcount = (int)placeholder;
+      thread_info_t* info = status;
+      int threadswapcount = info->swapcount;
       // Hint - you will need to cast something.
       printf("%d swaps.\n",threadswapcount); // Don't change this line
       totalswapcount += threadswapcount;// Don't change this line
