@@ -25,10 +25,6 @@ void *run_enzyme(void *data) {
   7. If "use_yield" is nonzero then call pthread_yield at the end of the loop.
   8. Return a pointer to the updated structure.
   */
-  // while(0) {
-  //     pthread_yield();
-  // };
-  // return NULL;
 
   thread_info_t* info = data;
   info->swapcount = 0;
