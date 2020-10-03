@@ -74,11 +74,6 @@ int join_on_enzymes(pthread_t *threads, int n) {
   int i;
   int totalswapcount = 0;
 
-  // Just to make the code compile. You will need to replace every usage of
-  // this variable in the code below. When you are done, placeholder can be
-  // deleted.
-  void* status = 0;
-
   for(i = 0; i < n; i++) {
     void *status;
     int cancel_count = 0;
