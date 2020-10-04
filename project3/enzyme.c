@@ -76,7 +76,6 @@ int join_on_enzymes(pthread_t *threads, int n) {
 
   for(i = 0; i < n; i++) {
     void *status;
-    int cancel_count = 0;
     int rv = pthread_join(threads[i], &status);
 
     if (rv) {
@@ -85,7 +84,6 @@ int join_on_enzymes(pthread_t *threads, int n) {
     }
 
     if ((void*)status == PTHREAD_CANCELED) {
-      cancel_count++;
       continue;
     } else if (status == NULL) {
       printf("Thread %d did not return anything\n",i);
