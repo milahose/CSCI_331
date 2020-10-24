@@ -70,8 +70,6 @@ void *adder(void *arg)
     int startOffset, remainderOffset;
     int i;
 
-    return NULL; /* remove this line */
-
     while (1) {
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
@@ -107,8 +105,6 @@ void *multiplier(void *arg)
     int startOffset, remainderOffset;
     int i;
 
-    return NULL; /* remove this line */
-
     while (1) {
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
@@ -136,8 +132,6 @@ void *degrouper(void *arg)
 {
     int bufferlen;
     int i;
-
-    return NULL; /* remove this line */
 
     while (1) {
 
@@ -169,8 +163,6 @@ void *sentinel(void *arg)
     char numberBuffer[20];
     int bufferlen;
     int i;
-
-    return NULL; /* remove this line */
 
     while (1) {
 
@@ -266,8 +258,8 @@ int smp3_main(int argc, char **argv)
     pthread_detach(multiplierThread);
     pthread_detach(adderThread);
     pthread_detach(degrouperThread);
-    pthread_detach(sentinelThread);
     pthread_detach(readerThread);
+    pthread_join(sentinelThread, NULL);
 
     /* everything is finished, print out the number of operations performed */
     fprintf(stdout, "Performed a total of %d operations\n", num_ops);
