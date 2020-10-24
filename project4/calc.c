@@ -70,6 +70,8 @@ void *adder(void *arg)
     int startOffset, remainderOffset;
     int i;
 
+    return NULL; /* remove this line */
+
     while (1) {
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
@@ -105,6 +107,8 @@ void *multiplier(void *arg)
     int startOffset, remainderOffset;
     int i;
 
+    return NULL; /* remove this line */
+
     while (1) {
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
@@ -132,6 +136,8 @@ void *degrouper(void *arg)
 {
     int bufferlen;
     int i;
+
+    return NULL; /* remove this line */
 
     while (1) {
 
@@ -163,6 +169,8 @@ void *sentinel(void *arg)
     char numberBuffer[20];
     int bufferlen;
     int i;
+
+    return NULL; /* remove this line */
 
     while (1) {
 
