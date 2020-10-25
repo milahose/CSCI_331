@@ -10,7 +10,14 @@ pthread_t sentinelThread;
 
 char buffer[BUF_SIZE];
 int num_ops;
+static pthread_mutex_t buffer_lock = PTHREAD_MUTEX_INITIALIZER;
+static sem_t progress_lock;
 
+struct progress_t {
+    int add;
+    int mult;
+    int group;
+} progress;
 
 /* Utiltity functions provided for your convenience */
 
@@ -76,7 +83,10 @@ void *adder(void *arg)
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
 
+        pthread_mutex_lock(&buffer_lock);
+
         if (timeToFinish()) {
+            pthread_mutex_unlock(&buffer_lock);
             return NULL;
         }
 
@@ -91,6 +101,10 @@ void *adder(void *arg)
             // once we have value1, value2 and start and end offsets of the
             // expression in buffer, replace it with v1+v2
         }
+
+        pthread_mutex_unlock(&buffer_lock);
+        sem_wait(&progress_lock);
+        sem_post(&progress_lock);
 
         // something missing?
         sched_yield();
@@ -114,7 +128,10 @@ void *multiplier(void *arg)
         startOffset = remainderOffset = -1;
         value1 = value2 = -1;
 
+        pthread_mutex_lock(&buffer_lock);
+
         if (timeToFinish()) {
+            pthread_mutex_unlock(&buffer_lock);
             return NULL;
         }
 
@@ -124,6 +141,10 @@ void *multiplier(void *arg)
         for (i = 0; i < bufferlen; i++) {
             // same as adder, but v1*v2
         }
+
+        pthread_mutex_unlock(&buffer_lock);
+        sem_wait(&progress_lock);
+        sem_post(&progress_lock);
 
         // something missing?
         sched_yield();
@@ -143,7 +164,10 @@ void *degrouper(void *arg)
 
     while (1) {
 
+        pthread_mutex_lock(&buffer_lock);
+
         if (timeToFinish()) {
+            pthread_mutex_unlock(&buffer_lock);
             return NULL;
         }
 
@@ -155,6 +179,10 @@ void *degrouper(void *arg)
             // remove ')' by shifting the tail end of the expression
             // remove '(' by shifting the beginning of the expression
         }
+
+        pthread_mutex_unlock(&buffer_lock);
+        sem_wait(&progress_lock);
+        sem_post(&progress_lock);
 
         // something missing?
         sched_yield();
@@ -177,7 +205,10 @@ void *sentinel(void *arg)
 
     while (1) {
 
+        pthread_mutex_lock(&buffer_lock);
+
         if (timeToFinish()) {
+            pthread_mutex_unlock(&buffer_lock);
             return NULL;
         }
 
@@ -203,6 +234,21 @@ void *sentinel(void *arg)
                 numberBuffer[i] = buffer[i];
             }
         }
+
+        if (buffer[0] != '\0') {
+            sem_wait(&progress_lock);
+            if (progress.add && progress.mult && progress.group) {
+                if (progress.add > 1 || progress.mult > 1 || progress.group > 1) {
+                    progress.add = progress.mult = progress.group = 0;
+                } else {
+                    fprintf(stdout, "No progress can be made\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            sem_post(&progress_lock);
+        }
+
+        pthread_mutex_unlock(&buffer_lock);
 
         // something missing?
         sched_yield();
@@ -243,6 +289,11 @@ void *reader(void *arg)
         /* we can add another expression now */
         strcat(buffer, tBuffer);
         strcat(buffer, ";");
+
+        sem_wait(&progress_lock);
+        progress.add = progress.mult = progress.group = 0;
+        sem_post(&progress_lock);
+        pthread_mutex_unlock(&buffer_lock);
 
         /* Stop when user enters '.' */
         if (tBuffer[0] == '.') {
