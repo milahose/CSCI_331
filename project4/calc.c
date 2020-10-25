@@ -93,6 +93,7 @@ void *adder(void *arg)
         }
 
         // something missing?
+        sched_yield();
     }
 }
 
@@ -125,6 +126,7 @@ void *multiplier(void *arg)
         }
 
         // something missing?
+        sched_yield();
     }
 }
 
@@ -155,6 +157,7 @@ void *degrouper(void *arg)
         }
 
         // something missing?
+        sched_yield();
     }
 }
 
@@ -202,6 +205,7 @@ void *sentinel(void *arg)
         }
 
         // something missing?
+        sched_yield();
     }
 }
 
@@ -244,6 +248,8 @@ void *reader(void *arg)
         if (tBuffer[0] == '.') {
             return NULL;
         }
+
+        sched_yield();
     }
 }
 
@@ -266,8 +272,8 @@ int smp3_main(int argc, char **argv)
     pthread_detach(multiplierThread);
     pthread_detach(adderThread);
     pthread_detach(degrouperThread);
-    pthread_detach(sentinelThread);
-    pthread_join(readerThread, NULL);
+    pthread_detach(readerThread);
+    pthread_join(sentinelThread, NULL);
 
     /* everything is finished, print out the number of operations performed */
     fprintf(stdout, "Performed a total of %d operations\n", num_ops);
